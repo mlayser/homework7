@@ -1,0 +1,114 @@
+<!-- Angular and Angular Animation -->
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.6/angular.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.6/angular-animate.min.js"></script>
+<body ng-app="myApp" ng-controller="MainController">
+    <div class="row top-buffer">
+        <button class="btn btn-default" ng-click="countdown()" ng-disabled="countingDown">Coundown</button> <span class="label label-info">{{ label }}</span>
+
+    </div>
+    <div class="row top-buffer">
+        <button class="btn btn-default" ng-click="fadeImage()" ng-disabled="fadingIn">Fade Image</button>
+        <img src="http://appendto.com/wp-content/uploads/2014/07/icon-logo-angular.png" class="animation" ng-if="imageVisible"></img>
+    </div>
+    <div class="row top-buffer">
+        <button class="btn btn-default" ng-click="startFadeAndCountdown()" ng-disabled="ableToActivate()">Fade Image & Countdown</button>
+    </div>
+    <div class="row top-buffer">
+        <button class="btn btn-default" ng-click="resetAll()" ng-disabled="ableToReset()">Reset Countdown & Image</button>
+    </div>
+</body>
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+
+<style>
+    body {
+    background:lightgray !important;
+}
+.top-buffer {
+    margin-top:20px;
+    margin-left:20px;
+}
+.animation.ng-enter {
+    -webkit-transition: 4s;
+}
+.animation.ng-leave {
+    -webkit-transition: 0s;
+}
+.animation.ng-enter {
+    opacity: 0;
+}
+.animation.ng-leave {
+    opacity: 1;
+}
+.animation.ng-enter.ng-enter-active {
+    opacity: 1;
+}
+.animation.ng-leave.ng-leave-active {
+    opacity: 0;
+}
+</style>
+
+<script>
+    var app = angular.module('myApp', ['ngAnimate']);
+
+    app.controller('MainController', ['$scope', '$timeout', '$animate', function ($scope, $timeout, $animate) {
+        $scope.label = "Ready";
+        $scope.imageVisible = true;
+        interrupt = false;
+
+        $scope.countdown = function () {
+            $scope.countingDown = true;
+            if (angular.equals($scope.label, "Ready")) {
+                $scope.label = 11;
+            }
+            if (angular.equals($scope.label, 1) || interrupt) {
+                $scope.countingDown = false;
+                $scope.label = "Ready";
+                interrupt = false;
+            } else {
+                $timeout(function () {
+                    $scope.countdown();
+                }, 1000);
+                $scope.label--;
+            }
+        }
+
+        $scope.ableToActivate = function () {
+            return $scope.countingDown || $scope.fadingIn;
+        }
+
+        $scope.fadeImage = function () {
+            $scope.imageVisible = false;
+            $scope.fadingIn = true;
+            $timeout(function () {
+                $scope.makeVisible();
+            }, 1);
+        }
+
+        $scope.makeVisible = function () {
+            $scope.imageVisible = true
+            $timeout(function () {
+                $scope.fadingIn = false;
+            }, 4000);
+        }
+
+        $scope.startFadeAndCountdown = function () {
+            $scope.fadeImage();
+            $scope.countdown();
+        }
+
+        $scope.resetAll = function () {
+            interrupt = true;
+            $animate.enabled(false);
+            $scope.imageVisible = true;
+            $scope.fadingIn = false;
+            $animate.enabled(true);
+        }
+
+        $scope.ableToReset = function () {
+            return !$scope.countingDown && !$scope.fadingIn;
+        }
+
+    }]);
+</script>
